@@ -1,4 +1,4 @@
-# caps-finder-server (WIP)
+# caps-finder-core (WIP)
 
 A rewrite of server for the caps client
 
