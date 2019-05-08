@@ -4,5 +4,8 @@
  * @param {Pile} pile
  */
 export default function (cards, pile) {
-  return cards.maxRank === pile.lastPlayedRank && cards.size === pile.numCardsOfRank(cards.maxRank);
+  return (
+    cards.maxRank === pile.lastPlayedRank
+    && cards.size + pile.getNumCardsOfRank(cards.maxRank) === 4
+  );
 }

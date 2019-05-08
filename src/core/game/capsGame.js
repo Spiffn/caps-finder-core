@@ -9,16 +9,20 @@ export default class CapsGame extends EventEmitter {
   }
 
   recieveInput({ command, data }) {
-    if (this.command === Commands.STARTGAME && this.context.isWaiting) {
-      this.context.setNextState();
+    try {
+      if (this.command === Commands.STARTGAME && this.context.isWaiting) {
+        this.context.setNextState();
+        this.emit('update');
+        return;
+      }
+      this.context.handleInput({ command, data });
+      if (this.context.canTransition) {
+        this.context.setNextState();
+      }
       this.emit('update');
-      return;
+    } catch (e) {
+      this.emit('error', e);
     }
-    this.context.handleInput({ command, data });
-    if (this.context.canTransition) {
-      this.context.setNextState();
-    }
-    this.emit('update');
   }
 
   getData(player) {

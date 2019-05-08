@@ -127,6 +127,9 @@ export default class PlayingState {
       this.players.nextPlayer();
     } else {
       this.players.skip();
+      if (this.lastPlayedPlayer.id === this.players.currentPlayer.id) {
+        this.pile.clear();
+      }
     }
     this.lastPlayedPlayer = this.players.currentPlayer;
   }
