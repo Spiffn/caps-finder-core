@@ -1,5 +1,5 @@
-import CardCollection from '../../../entities/cardCollection';
-import Pile from '../../../entities/pile';
+import CardCollection from '../../entities/cardCollection';
+import Pile from '../../entities/pile';
 import isCompletion from './isCompletion';
 
 /**

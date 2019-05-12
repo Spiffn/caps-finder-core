@@ -8,7 +8,9 @@ export default function ({
   pile,
   isCurrentPlayer,
   isFirstTurn,
+  clearPile,
   goToNextPlayer,
+  recordSuccess,
   scumOut,
   onError,
 }) {
@@ -19,10 +21,11 @@ export default function ({
     const jump = calculateJump(cards, pile);
     player.hand.removeAll(cards);
     if (cards.maxRank === 2 || isCompletion(cards, pile)) {
-      pile.clear();
+      clearPile();
     } else {
       pile.add(cards);
     }
+    recordSuccess(player, cards);
     goToNextPlayer(player, jump);
   } else {
     onError();

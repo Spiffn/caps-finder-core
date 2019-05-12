@@ -1,5 +1,5 @@
-import Player from '../../../entities/player';
-import Card from '../../../entities/card';
+import Player from '../../entities/player';
+import Card from '../../entities/card';
 
 export default function (firstPlayer, secondPlayer, requestedRank, cardToGive) {
   if (!(firstPlayer instanceof Player) || !(secondPlayer instanceof Player)) {

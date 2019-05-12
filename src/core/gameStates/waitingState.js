@@ -1,16 +1,17 @@
-import PlayerCollection from '../../entities/playerCollection';
+import PlayerCollection from '../entities/playerCollection';
+import Player from '../entities/player';
 import Commands from '../commands';
-import Player from '../../entities/player';
 
 /**
  * Game state for the waiting phase before the game starts
  */
 export default class WaitingState {
-  constructor(players) {
+  constructor(players, history) {
     if (!(players instanceof PlayerCollection)) {
       throw new Error('Invalid parameter');
     }
     this.players = players;
+    this.history = history;
     this.newPlayers = [];
   }
 

@@ -1,7 +1,7 @@
 import WaitingState from './gameStates/waitingState';
-import PlayerCollection from '../entities/playerCollection';
+import PlayerCollection from './entities/playerCollection';
 import PlayingState from './gameStates/playingState';
-import Deck from '../entities/deck';
+import Deck from './entities/deck';
 import SelectState from './gameStates/selectState';
 import TradeState from './gameStates/tradeState';
 
@@ -16,9 +16,10 @@ function dealToPlayers(players) {
 }
 
 export default class GameContext {
-  constructor() {
+  constructor(history) {
     this.isFirstGame = true;
-    this.state = new WaitingState(new PlayerCollection());
+    this.history = history;
+    this.state = new WaitingState(new PlayerCollection(), this.history);
   }
 
   get isWaiting() {
@@ -35,20 +36,20 @@ export default class GameContext {
       if (this.isFirstGame) {
         this.isFirstGame = false;
         dealToPlayers(players);
-        return new PlayingState(players);
+        return new PlayingState(players, this.history);
       }
-      return new SelectState(players);
+      return new SelectState(players, this.history);
     }
     if (this.state instanceof PlayingState) {
       const { finished, scummedOut, newPlayers } = this.state;
       const players = finished.concat(scummedOut).concat(newPlayers);
-      return new WaitingState(players);
+      return new WaitingState(players, this.history);
     }
     if (this.state instanceof SelectState) {
-      return new TradeState(this.state.players);
+      return new TradeState(this.state.players, this.history);
     }
     if (this.state instanceof TradeState) {
-      return new PlayingState(this.state.players);
+      return new PlayingState(this.state.players, this.history);
     }
     throw new Error('Invalid state');
   }

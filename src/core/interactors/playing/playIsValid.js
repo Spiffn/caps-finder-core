@@ -1,7 +1,7 @@
-import CardCollection from '../../../entities/cardCollection';
-import Pile from '../../../entities/pile';
-import Card from '../../../entities/card';
-import suits from '../../../entities/suits';
+import CardCollection from '../../entities/cardCollection';
+import Pile from '../../entities/pile';
+import Card from '../../entities/card';
+import suits from '../../entities/suits';
 import isCompletion from './isCompletion';
 
 export default function (hand, cards, pile, isCurrentPlayer, isFirstTurn) {

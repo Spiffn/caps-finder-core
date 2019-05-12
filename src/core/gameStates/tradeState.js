@@ -1,4 +1,4 @@
-import PlayerCollection from '../../entities/playerCollection';
+import PlayerCollection from '../entities/playerCollection';
 import tradeCards from '../interactors/trading/tradeCards';
 import Commands from '../commands';
 
@@ -6,12 +6,12 @@ import Commands from '../commands';
  * Game state for the trading phase
  */
 export default class TradeState {
-  constructor(players) {
+  constructor(players, history) {
     if (!(players instanceof PlayerCollection)) {
       throw new Error('Invalid parameter');
     }
     this.players = players;
-
+    this.history = history;
     this.presidentTrades = this.hasVicePresident ? 2 : 1;
     this.vicePresidentTrades = this.hasVicePresident ? 1 : 0;
     this.availableFromScum = [];

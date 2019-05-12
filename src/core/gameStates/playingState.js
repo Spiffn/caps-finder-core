@@ -1,10 +1,11 @@
-import Card from '../../entities/card';
-import Pile from '../../entities/pile';
-import Player from '../../entities/player';
-import PlayerCollection from '../../entities/playerCollection';
-import suits from '../../entities/suits';
+import Card from '../entities/card';
+import Pile from '../entities/pile';
+import Player from '../entities/player';
+import PlayerCollection from '../entities/playerCollection';
+import suits from '../entities/suits';
 import playCards from '../interactors/playing/playCards';
 import Commands from '../commands';
+import GameEvents from '../gameEvents';
 
 const threeOfClubs = new Card(3, suits.clubs);
 
@@ -13,11 +14,12 @@ const threeOfClubs = new Card(3, suits.clubs);
  * Should be instantiated with a PlayerCollection that already has hands
  */
 export default class PlayingState {
-  constructor(players) {
+  constructor(players, history) {
     if (!(players instanceof PlayerCollection)) {
       throw new Error('Invalid parameter');
     }
     this.players = players;
+    this.history = history;
     this.players.currentPlayer = this.players.at(0);
     this.pile = new Pile();
     this.players.currentPlayer = this.players.getPlayerWithCard(threeOfClubs);
@@ -34,14 +36,15 @@ export default class PlayingState {
       throw new Error('Invalid player');
     }
     const handler = {
-      [Commands.PLAYCARD]: () => this.play(player, data.cards),
+      [Commands.ADDPLAYER]: () => this.addPlayer(data.playerId),
+      [Commands.FOLD]: () => this.scumOut(player),
       [Commands.PASS]: () => this.pass(player),
-      [Commands.ADDPLAYER]: () => this.ADDPLAYER(data.playerId),
+      [Commands.PLAYCARD]: () => this.play(player, data.cards),
       default: () => {
         throw new Error('Invalid action');
       },
     };
-    if (![Commands.PLAYCARD, Commands.PASS, Commands.ADDPLAYER].includes(command)) {
+    if (![Commands.PLAYCARD, Commands.PASS, Commands.ADDPLAYER, Commands.FOLD].includes(command)) {
       handler.default();
     } else {
       handler[command]();
@@ -85,8 +88,12 @@ export default class PlayingState {
       return;
     }
     this.players.nextPlayer();
+    this.history.log({
+      player: player.id,
+      type: GameEvents.PASS,
+    });
     if (this.currentPlayer.id === this.lastPlayedPlayer.id) {
-      this.pile.clear();
+      this.clearPile();
       this.lastPlayedPlayer = this.players.currentPlayer;
     }
   }
@@ -102,6 +109,8 @@ export default class PlayingState {
       pile: this.pile,
       isCurrentPlayer: player.id === this.currentPlayer.id,
       isFirstTurn: this.isFirstTurn,
+      recordSuccess: this.recordSuccess,
+      clearPile: this.clearPile,
       goToNextPlayer: this.goToNextPlayer,
       scumOut: this.scumOut,
       onError: () => {
@@ -128,15 +137,34 @@ export default class PlayingState {
     } else {
       this.players.skip();
       if (this.lastPlayedPlayer.id === this.players.currentPlayer.id) {
-        this.pile.clear();
+        this.clearPile();
       }
     }
     this.lastPlayedPlayer = this.players.currentPlayer;
+  }
+
+  recordSuccess(player, cards) {
+    this.history.log({
+      player: player.id,
+      type: GameEvents.PLAYCARD,
+      data: cards.serialize(),
+    });
+  }
+
+  clearPile() {
+    this.pile.clear();
+    this.history.log({
+      type: GameEvents.CLEAR,
+    });
   }
 
   scumOut(player) {
     this.players.remove(player);
     this.lastPlayedPlayer = this.players.currentPlayer;
     this.scummedOut.push(player);
+    this.history.log({
+      player: player.id,
+      type: GameEvents.SCUMOUT,
+    });
   }
 }

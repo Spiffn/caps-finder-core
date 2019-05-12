@@ -1,18 +1,20 @@
-import CardCollection from '../../entities/cardCollection';
-import Deck from '../../entities/deck';
-import PlayerCollection from '../../entities/playerCollection';
+import CardCollection from '../entities/cardCollection';
+import Deck from '../entities/deck';
+import PlayerCollection from '../entities/playerCollection';
 import Commands from '../commands';
+import GameEvents from '../gameEvents';
 
 /**
  * Game state for when players need to choose their hand
  */
 export default class SelectState {
-  constructor(players) {
+  constructor(players, history) {
     if (!(players instanceof PlayerCollection)) {
       throw new Error('Invalid parameter');
     }
     players.clearHands();
     this.players = players;
+    this.history = history;
     this.handsToChooseFrom = [];
     const deck = new Deck();
     deck.shuffle();
@@ -82,8 +84,17 @@ export default class SelectState {
         this.currentPlayer.hand.merge(this.handsToChooseFrom[i]);
         this.handsToChooseFrom.splice(i, 1);
         this.players.nextPlayer();
+        this.recordChoice(player, topCard);
         return;
       }
     }
+  }
+
+  recordChoice(player, topCard) {
+    this.history.log({
+      player: player.id,
+      type: GameEvents.CHOOSEHAND,
+      data: topCard.serialize(),
+    });
   }
 }

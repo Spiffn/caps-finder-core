@@ -1,8 +1,8 @@
 import calculateJump from './calculateJump';
-import Pile from '../../../entities/pile';
-import CardCollection from '../../../entities/cardCollection';
-import Card from '../../../entities/card';
-import suits from '../../../entities/suits';
+import Pile from '../../entities/pile';
+import CardCollection from '../../entities/cardCollection';
+import Card from '../../entities/card';
+import suits from '../../entities/suits';
 
 const threeOfClubs = new Card(3, suits.clubs);
 const threeOfDiamonds = new Card(3, suits.diamonds);
